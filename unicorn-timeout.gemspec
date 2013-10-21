@@ -14,4 +14,7 @@ Gem::Specification.new do |gem|
   gem.name          = "unicorn-timeout"
   gem.require_paths = ["lib"]
   gem.version       = Unicorn::Timeout::VERSION
+
+  gem.add_development_dependency "bundler", "~> 1.3"
+  gem.add_development_dependency "rake"
 end
