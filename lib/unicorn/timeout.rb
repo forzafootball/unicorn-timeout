@@ -3,6 +3,8 @@ module Unicorn
     @timeout = 15
     @handler = lambda { |backtrace| STDERR.puts("Unicorn::Timeout is killing worker ##{Process.pid} with backtrace:\n#{backtrace.inspect}") }
     @signal = "TERM"
+    MUTEX_FOR_TIMEOUT = Mutex.new
+
     class << self
       attr_accessor :timeout
       attr_accessor :handler
@@ -34,7 +36,7 @@ module Unicorn
       end
 
       def kill_main_thread(t)
-        Thread.exclusive do
+        MUTEX_FOR_TIMEOUT.synchronize do
           begin
             self.class.handler.call(t.backtrace)
           ensure
@@ -44,7 +46,7 @@ module Unicorn
       end
 
       def kill_mon_thread(t)
-        Thread.exclusive do
+        MUTEX_FOR_TIMEOUT.synchronize do
           t.kill
           t.join
         end
